@@ -1,0 +1,1 @@
+digraph G{"0"->"tigo" "0"->"compras" "tigo"->"0" "tigo"->"koka" "compras"->"koka" "compras"->"0" "koka"->"compras" "koka"->"tigo" }
