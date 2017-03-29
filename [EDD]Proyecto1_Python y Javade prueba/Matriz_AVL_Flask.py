@@ -72,6 +72,11 @@ class Matriz(object):
 			return None
 		encontrado=False
 		while actual!=None and encontrado==False:
+				actual2=actual
+				while actual2:
+					if actual2.Nombre==usuario and actual2.Empresa==empresa:
+						return actual2
+					actual2=actual2.AbajoP
 				if actual.Nombre==usuario and actual.Empresa==empresa:
 					return actual
 				else:
@@ -448,6 +453,7 @@ class Nodo:
 		self.ID=None
 		self.nombre=None
 		self.descripcion=None
+		self.rentado=False
 	 def getSiguiente(self):
 		return self.siguiente
 	 def setSiguiente(self,siguiente):
@@ -620,6 +626,22 @@ class ArbolAVL:
 			self.preorder(self.raiz)
 			if self.raiz.derecha==None and self.raiz.izquierda==None:
 				self.resultado="\""+str(self.raiz.ID)+"\""
+	def activos(self):
+		self.resultado=""
+		if self.raiz!=None:
+			self.preorder2(self.raiz)
+		return self.resultado
+	def activosDisp(self):
+		self.resultado=""
+		if self.raiz!=None:
+			self.preorder4(self.raiz)
+		return self.resultado
+	def buscar(self,ID):
+		self.resultado=""
+		if self.raiz!=None:
+			self.preorder3(self.raiz,ID)
+		return self.resultado
+
 	def preorder(self,actual):
 		if actual.izquierda!=None:
 			self.resultado=self.resultado+" \""+actual.ID+"\"->\""+actual.izquierda.ID+"\""
@@ -627,7 +649,54 @@ class ArbolAVL:
 		if actual.derecha!=None:
 			self.resultado=self.resultado+" \""+actual.ID+"\"->\""+actual.derecha.ID+"\""
 			self.preorder(actual.derecha)
+	def preorder2(self,actual):
+			self.resultado=self.resultado+actual.ID+" "
+			if actual.izquierda!=None:
+				self.preorder2(actual.izquierda)
+			if actual.derecha!=None:
+				self.preorder2(actual.derecha)
+	def preorder3(self,actual,ID):
+			if actual.ID==ID:
+				self.resultado=actual
+			if actual.izquierda!=None:
+				self.preorder3(actual.izquierda,ID)
+			if actual.derecha!=None:
+				self.preorder3(actual.derecha,ID)
+	def preorder4(self,actual):
+			if actual.rentado==False:
+				self.resultado=self.resultado+actual.ID+" "
+			if actual.izquierda!=None:
+				self.preorder4(actual.izquierda)
+			if actual.derecha!=None:
+				self.preorder4(actual.derecha)
 
+def stringmatriz():
+	print("fdafa")
+	auxiliar=mat.Inicio
+	auxiliar2=auxiliar
+	resultado="digraph G{"
+	while auxiliar2:
+		auxiliar=auxiliar2
+		while auxiliar:
+			if auxiliar.Derecha!=None:
+				resultado=resultado+'"'+auxiliar.Nombre+'"->"'+auxiliar.Derecha.Nombre+'" '
+			if auxiliar.Izquierda!=None:
+				resultado=resultado+'"'+auxiliar.Nombre+'"->"'+auxiliar.Izquierda.Nombre+'" '
+			if auxiliar.Arriba!=None:
+				resultado=resultado+'"'+auxiliar.Nombre+'"->"'+auxiliar.Arriba.Nombre+'" '
+			if auxiliar.Abajo!=None:
+				resultado=resultado+'"'+auxiliar.Nombre+'"->"'+auxiliar.Abajo.Nombre+'" '
+			if auxiliar.AbajoP!=None:
+				auxiliar3=auxiliar
+				while auxiliar3.AbajoP:
+					resultado=resultado+'"'+auxiliar3.Nombre+'"->"'+auxiliar3.AbajoP.Nombre+'" '
+					resultado=resultado+'"'+auxiliar3.AbajoP.Nombre+'"->"'+auxiliar3.Nombre+'" '
+					auxiliar3=auxiliar3.AbajoP
+			auxiliar=auxiliar.Derecha
+		auxiliar2=auxiliar2.Abajo
+	resultado=resultado+"}"
+	return resultado
+	 
 def creartxtmatriz():
 	 archi=open('matriz.txt','w')
 	 archi.close
@@ -659,6 +728,16 @@ def crearmatriz():
     archi.write("}")
     archi.close()
     ejecutar("matriz")
+def stringAVL(user,empresa,departamento):
+	resultado="digraph G {"
+	usuario=mat.buscarUser(user,empresa,departamento)
+	if usuario!=None:
+		usuario.arbol.graficar()
+		resultado=resultado+usuario.arbol.resultado
+	resultado=resultado+"}"
+	return resultado
+
+
 def creartxtAVL(usuario):
 	 archi=open('AVL.txt','w')
 	 archi.close
@@ -708,7 +787,7 @@ def agregaractivo(usuario,nombre,descripcion):
 		if codigos.buscar(cod)==False:
 			codigos.insertar(cod)
 			valido=True
-	print(usuario.Nombre+","+usuario.Empresa+","+usuario.Dep)	
+	#print(usuario.Nombre+","+usuario.Empresa+","+usuario.Dep)	
 	usuario.arbol.insertar(cod,nombre,descripcion)
 	usuario.lista.insertar2(cod,nombre,descripcion)
 	creartxtAVL(usuario)
@@ -723,8 +802,92 @@ def eliminaractivo(usuario,ID):
 def modificaractivo(usuario,ID,descripcion):
 	actual=usuario.arbol.buscar(ID)
 	actual.descripcion=descripcion
-
-
+def activosUsuario(user,empresa,departamento):
+	usuario=mat.buscarUser(user,empresa,departamento)
+	return usuario.arbol.activos()
+def todosActivos():
+	resultado=""
+	aux=mat.Inicio
+	while aux:
+		aux2=aux
+		while aux2:
+			aux3=aux2.AbajoP
+			while aux3:
+				if aux3.arbol.raiz!=None:
+					resultado=resultado+aux3.arbol.activos()
+				aux3=aux3.AbajoP
+			if aux2.arbol.raiz!=None:
+				resultado=resultado+aux2.arbol.activos()
+			aux2=aux2.Derecha
+		aux=aux.Abajo
+	return resultado
+def activosDisponibles():
+	resultado=""
+	aux=mat.Inicio
+	while aux:
+		aux2=aux
+		while aux2:
+			aux3=aux2.AbajoP
+			while aux3:
+				if aux3.arbol.raiz!=None:
+					resultado=resultado+aux3.arbol.activosDisp()
+				aux3=aux3.AbajoP
+			if aux2.arbol.raiz!=None:
+				resultado=resultado+aux2.arbol.activosDisp()
+			aux2=aux2.Derecha
+		aux=aux.Abajo
+	return resultado
+def buscarnombre(ID):
+	resultado=""
+	aux=mat.Inicio
+	while aux:
+		aux2=aux
+		while aux2:
+			aux3=aux2.AbajoP
+			while aux3:
+				if aux3.arbol.raiz!=None:
+					if aux3.arbol.buscar(ID)!=None:
+						return aux3.arbol.buscar(ID)
+				aux3=aux3.AbajoP
+			if aux2.arbol.raiz!=None:
+				if aux2.arbol.buscar(ID)!=None:
+						return aux2.arbol.buscar(ID)
+			aux2=aux2.Derecha
+		aux=aux.Abajo
+def bandTrue(ID):
+	resultado=""
+	aux=mat.Inicio
+	while aux:
+		aux2=aux
+		while aux2:
+			aux3=aux2.AbajoP
+			while aux3:
+				if aux3.arbol.raiz!=None:
+					if aux3.arbol.buscar(ID)!=None:
+						aux3.arbol.buscar(ID).rentado=True
+				aux3=aux3.AbajoP
+			if aux2.arbol.raiz!=None:
+				if aux2.arbol.buscar(ID)!=None:
+						aux2.arbol.buscar(ID).rentado=True
+			aux2=aux2.Derecha
+		aux=aux.Abajo
+def bandFalse(ID):
+	resultado=""
+	aux=mat.Inicio
+	while aux:
+		aux2=aux
+		while aux2:
+			aux3=aux2.AbajoP
+			while aux3:
+				if aux3.arbol.raiz!=None:
+					if aux3.arbol.buscar(ID)!=None:
+						aux3.arbol.buscar(ID).rentado=False
+				aux3=aux3.AbajoP
+			if aux2.arbol.raiz!=None:
+				if aux2.arbol.buscar(ID)!=None:
+						aux2.arbol.buscar(ID).rentado=False
+			aux2=aux2.Derecha
+		aux=aux.Abajo
 
 from flask import Flask, request, Response
 app = Flask("EDD_codigo_ejemplo")
@@ -736,7 +899,7 @@ codigos=ListaSimple()
 def hello():
 	parametro = str(request.form['dato'])
 	dato2 = str(request.form['dato2'])
-	return "Hola " + str(parametro) + "!"
+	return "Hola"
 
 @app.route("/e")
 def hellof():
@@ -800,20 +963,105 @@ def helloe():
 	eliminaractivo(usuario,codarticulo)
 	return  "eliminado"
 
+@app.route("/graficarMatriz",methods=['POST'])
+def hellog():
+	user=str(request.form['dato1'])
+	resultado=stringmatriz()
+	return  resultado
+
+@app.route("/graficarEmpresa",methods=['POST'])
+def helloh():
+	empresa=str(request.form['dato1'])
+	empre=mat.buscarempresa(empresa)
+	resultado="digraph G{ "
+	if empre!=None:
+		while empre:
+			auxiliar3=None
+			if empre.AbajoP!=None:
+				auxiliar3=empre
+				while auxiliar3.AbajoP:
+					resultado=resultado+auxiliar3.Nombre+"->"+auxiliar3.AbajoP.Nombre+" "
+					auxiliar3=auxiliar3.AbajoP
+			if auxiliar3!=None and empre.Abajo!=None:
+				resultado=resultado+auxiliar3.Nombre+"->"+empre.Abajo.Nombre+" "
+			elif empre.Abajo!=None:
+				resultado=resultado+empre.Nombre+"->"+empre.Abajo.Nombre+" "
+			empre=empre.Abajo
+	resultado=resultado+"}"
+	return  resultado
+
+@app.route("/graficarDepartamento",methods=['POST'])
+def helloi():
+	departamento=str(request.form['dato1'])
+	dep=mat.buscarDep(departamento)
+	resultado="digraph G{ "
+	if dep!=None:
+		while dep:
+			auxiliar3=None
+			if dep.AbajoP!=None:
+				auxiliar3=dep
+				while auxiliar3.AbajoP:
+					resultado=resultado+auxiliar3.Nombre+"->"+auxiliar3.AbajoP.Nombre+" "
+					auxiliar3=auxiliar3.AbajoP
+			if auxiliar3!=None and dep.Derecha!=None:
+				resultado=resultado+auxiliar3.Nombre+"->"+dep.Derecha.Nombre+" "
+			elif dep.Derecha!=None:
+				resultado=resultado+dep.Nombre+"->"+dep.Derecha.Nombre+" "
+			dep=dep.Derecha
+	resultado=resultado+"}"
+	return  resultado
+
+@app.route("/graficarAVL",methods=['POST'])
+def helloj():
+	user=str(request.form['dato1'])
+	empresa=str(request.form['dato2'])
+	departamento=str(request.form['dato3'])
+	resultado=stringAVL(user,empresa,departamento)
+	return resultado
+
+@app.route("/activosUsuario",methods=['POST'])
+def hellok():
+	user=str(request.form['dato1'])
+	empresa=str(request.form['dato2'])
+	departamento=str(request.form['dato3'])
+	resultado=activosUsuario(user,empresa,departamento)
+	return resultado
+
+@app.route("/todosActivos",methods=['POST'])
+def hellol():
+	user=str(request.form['dato1'])
+	resultado=todosActivos()
+	return resultado
+
+@app.route("/devolverNombre",methods=['POST'])
+def hellom():
+	ID=str(request.form['dato1'])
+	resultado=buscarnombre(ID).nombre
+	return resultado
+@app.route("/devolverDescripcion",methods=['POST'])
+def hellon():
+	ID=str(request.form['dato1'])
+	resultado=buscarnombre(ID).descripcion
+	return resultado
+
+@app.route("/banderaTrue",methods=['POST'])
+def helloo():
+	ID=str(request.form['dato1'])
+	resultado=bandTrue(ID)
+	return "1"
+@app.route("/banderaFalse",methods=['POST'])
+def hellop():
+	ID=str(request.form['dato1'])
+	resultado=bandFalse(ID)
+	return "0"
+
+@app.route("/activosDisponibles",methods=['POST'])
+def helloq():
+	user=str(request.form['dato1'])
+	resultado=activosDisponibles()
+	return resultado
 
 if __name__ == "__main__":
   app.run(debug=True, host='0.0.0.0')
-
-
-#Entrada2
-# registrarse("ana","tigo","ventas","1234","ana juarez")
-# registrarse("marco","claro","compras","1234","ana juarez")
-# registrarse("aqui","claro","mantenimiento","1234","ana juarez")
-# registrarse("adios","tigo","ventas","1234","ana juarez")
-# registrarse("prueba","tigo","mantenimiento","1234","ana juarez")
-# registrarse("hola","avon","compras","1234","ana juarez")
-# registrarse("final","avon","mantenimiento","1234","ana juarez")
-
-# Entrada1
 
 print("termino")
