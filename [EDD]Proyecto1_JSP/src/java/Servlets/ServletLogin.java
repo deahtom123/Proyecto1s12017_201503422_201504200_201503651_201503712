@@ -19,7 +19,10 @@ import javax.servlet.http.HttpServletResponse;
  */
 @WebServlet(name = "ServletLogin", urlPatterns = {"/ServletLogin"})
 public class ServletLogin extends HttpServlet {
-
+            public static String user = "";
+            public static String pass = "";
+            public static String emp = "";
+            public static String dep = "";
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -35,28 +38,51 @@ public class ServletLogin extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             /* TODO output your page here. You may use following sample code. */
-            String user = request.getParameter("txt_usuario");
-            String pass = request.getParameter("txt_contra");
-            String emp = request.getParameter("txt_empresa");
-            String dep = request.getParameter("txt_departamento");
+            String titulo = "Error";
+            String mensaje = "";
+            user = request.getParameter("txt_usuario");
+            pass = request.getParameter("txt_contra");
+            emp = request.getParameter("txt_empresa");
+            dep = request.getParameter("txt_departamento");
+            boolean entro = false;
             
             if(user.equals("Nombre de Usuario") || user.equals("") || pass.equals("Contraseña") || pass.equals("") || emp.equals("Empresa") || emp.equals("") || dep.equals("") || dep.equals("Departamento"))
             {        
+                mensaje = "NO SE LLENARON CORRECTAMENTE TODOS LOS CAMPOS";
+            }
+            else{
+                String respuesta = Servidor.Login(user, emp, dep, pass);
+                if(respuesta.equals("Puede entrar")){
+                    titulo = "LOGGEADO";
+                    mensaje = "USUARIO LOGGEADO EXITOSAMENTE";
+                    entro = true;
+                }
+                
+                else if(respuesta.equals("contrasena incorrecta")){
+                    mensaje = "CONTRASEÑA INCORRECTA";
+                }
+                else if(respuesta.equals("no existe")){
+                    mensaje = "NO EXISTE EL USUARIO";
+                }
+
+            }
                 out.println("<!DOCTYPE html>");
                 out.println("<html>");
                 out.println("<head>");
-                out.println("<title>Servlet ServletLogin</title>");            
+                out.println("<title>"+titulo+"</title>");            
                 out.println("</head>");
                 out.println("<body>");
-
-                out.println("NO SE LLENARON CORRECTAMENTE LOS CAMPOS");
+                
+                
+                if (entro) {
+                out.println("<a href = \"usuariologeado.jsp\">"+mensaje+"</a>");
+                }
+                else{
+                    out.println(mensaje);
+                }
 
                 out.println("</body>");
-                out.println("</html>");   
-            }
-            else{
-                
-            }
+                out.println("</html>");    
 
         } finally {
             out.close();

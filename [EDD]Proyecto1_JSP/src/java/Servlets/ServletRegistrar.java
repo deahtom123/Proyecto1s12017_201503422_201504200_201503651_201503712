@@ -34,18 +34,34 @@ public class ServletRegistrar extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         PrintWriter out = response.getWriter();
         try {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ServletRegistrar</title>");            
-            out.println("</head>");
-            out.println("<body>");
+            String user = request.getParameter("txt_usuario");
+            String pass = request.getParameter("txt_contra");
+            String name = request.getParameter("txt_nombreCompleto");
+            String emp = request.getParameter("txt_empresa");
+            String dep = request.getParameter("txt_departamento");
             
-            out.println("REGISTRADO!");
+            String mensaje = "";
+            String titulo = "ERROR";
             
-            out.println("</body>");
-            out.println("</html>");
+            if(name.equals("") || name.equals("Nombre Completo") || user.equals("Nombre de Usuario") || user.equals("") || pass.equals("Contraseña") || pass.equals("") || emp.equals("Empresa") || emp.equals("") || dep.equals("") || dep.equals("Departamento"))
+            {        
+                mensaje = "NO SE LLENARON CORRECTAMENTE TODOS LOS CAMPOS";
+            }
+            else{
+                Servidor.Registrar(user, emp, dep, pass,name);
+                mensaje = "USUARIO REGISTRADO CON EXITO";
+                titulo = "REGISTRADO";
+            }
+                out.println("<!DOCTYPE html>");
+                out.println("<html>");
+                out.println("<head>");
+                out.println("<title>"+titulo+"</title>");            
+                out.println("</head>");
+                out.println("<body>");
+                out.println(mensaje);
+                out.println("</body>");
+                out.println("</html>");    
+                
         } finally {
             out.close();
         }

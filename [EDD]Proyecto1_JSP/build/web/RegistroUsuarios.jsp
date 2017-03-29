@@ -35,18 +35,19 @@
         <h1>Registrarse</h1>
             <div class="container">
                 <form method="post" action="ServletRegistrar">
+                  
                     <input type="txt" value="Nombre de Usuario" name="txt_usuario"/><br><br>
                     <input type="txt" value="Contraseña" name="txt_contra"/><br><br>
-                    <input type="txt" value="Nombre Completo" name="txt_empresa"/><br><br>
-                    <input type="txt" value="Empresa para la que trabaja" name="txt_departamento"/><br><br> 
+                    <input type="txt" value="Nombre Completo" name="txt_nombreCompleto"/><br><br>
+                    <input type="txt" value="Empresa para la que trabaja" name="txt_empresa"/><br><br> 
                     <input type="txt" value="Departamento en el que trabaja" name="txt_departamento"/><br><br> 
                     <input type="submit" value="Crear Usuario" name="btn_login">
                     <a href="index.jsp"><input type="button" value="Regresar" name="btn_registrar"></a>
                 </form>
             </div>
     </div>
+    </header>
 </div>
-</header>
 
 
 <script type="text/javascript">
